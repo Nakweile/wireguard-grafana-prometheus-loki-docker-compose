@@ -1,4 +1,5 @@
 ---
+version: '3.8'
 services:
   wireguard:
     image: lscr.io/linuxserver/wireguard:latest
@@ -25,4 +26,30 @@ services:
       - 51820:51820/udp
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
+    restart: unless-stopped
+
+  wireguard_exporter:
+    image: mindflavor/prometheus-wireguard-exporter:latest
+    container_name: wireguard_exporter
+    network_mode: "service:wireguard"  # Доступ к интерфейсу внутри wireguard
+    environment:
+      - WIREGUARD_INTERFACE=wg0
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus:/etc/prometheus
+    ports:
+      - 9090:9090
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana:/var/lib/grafana
     restart: unless-stopped
