@@ -2,6 +2,6 @@ global:
   scrape_interval: 15s
 
 scrape_configs:
-  - job_name: 'wireguard'
+  - job_name: wireguard
     static_configs:
-      - targets: ['wireguard_exporter:9586']
+      - targets: ["wireguard:9586"]
