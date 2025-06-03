@@ -13,15 +13,15 @@ services:
       - TZ=Europe/Moscow
       - SERVERURL=auto #optional
       - SERVERPORT=51820 #optional
-      - PEERS=myPhone,myPC #optional
+      - PEERS=myPC #optional
       - PEERDNS=auto #optional
       - INTERNAL_SUBNET=10.13.13.0 #optional
       - ALLOWEDIPS=0.0.0.0/0 #optional
       - PERSISTENTKEEPALIVE_PEERS=all #optional
       - LOG_CONFS=true #optional
     volumes:
-      - /path/to/wireguard/config:/config
-      - /lib/modules:/lib/modules #optional
+      - /home/pi/IOTstack/volumes/wireguard:/config
+      - /lib/modules:/lib/modules:ro
     ports:
       - 51820:51820/udp
     sysctls:
@@ -31,16 +31,18 @@ services:
   wireguard_exporter:
     image: mindflavor/prometheus-wireguard-exporter:latest
     container_name: wireguard_exporter
-    network_mode: "service:wireguard"  # Доступ к интерфейсу внутри wireguard
-    environment:
-      - WIREGUARD_INTERFACE=wg0
+    network_mode: host
+    command:
+      - --prepend_sudo=false    
+    cap_add:
+    - NET_ADMIN
     restart: unless-stopped
 
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
     volumes:
-      - ./prometheus:/etc/prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - 9090:9090
     restart: unless-stopped
@@ -48,8 +50,15 @@ services:
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
+    user: "472"  # UID графаны внутри контейнера
     ports:
       - 3000:3000
     volumes:
-      - ./grafana:/var/lib/grafana
+      - grafana-storage:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
     restart: unless-stopped
+
+volumes:
+  grafana-storage:
