@@ -8,7 +8,9 @@
 ---
 #### Monitoring & Logging Stack with Prometheus, Loki, and Grafana
 
-A complete stack for container metrics monitoring and log aggregation based on Docker Compose.
+    This version is not completely secure.
+
+A complete stack for container metrics monitoring and log aggregation based on Docker Compose. 
 
 ---
 ### Stack Components
@@ -86,3 +88,7 @@ bash
 - By default, Promtail collects logs from all Docker containers.
     
 - Default ports: Grafana `3000`, Prometheus `9090`, Loki `3100`.
+
+---
+### Improve
+- Reverse Proxy setup (напр., NGINX или Traefik)
